@@ -15,7 +15,15 @@ const Choice = require("inquirer/lib/objects/choice");
 // and to create objects for each team member (using the correct classes as blueprints!)
 const team = [];
 let willContinue = true;
-getEmployee();
+
+loopEmploees()
+
+async function loopEmploees(){
+  while (willContinue) {
+   willContinue = await getEmployee();
+  }
+  console.log(team)
+}
 
 async function getEmployee() {
   try {
@@ -59,8 +67,7 @@ async function getEmployee() {
         message: "Add more employees?",
       },
     ]);
-    willContinue = addMore;
-
+    return addMore;
   } catch (err) {
     console.log(err);
   }
