@@ -13,25 +13,40 @@ const Choice = require("inquirer/lib/objects/choice");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+
+
 const team = [];
 let willContinue = true;
+let idCount = 0;
 
 loopEmploees()
+
 
 async function loopEmploees(){
   while (willContinue) {
    willContinue = await getEmployee();
+   idCount++;
   }
-  console.log(team)
+  const html = render(team)
+  fs.writeFile("./output/team.html", html, (err)=>{
+    console.log(err)
+  })
 }
 
+//function to get employees
 async function getEmployee() {
   try {
-    const data1 = await inquirer.prompt([
+    //start first inquirer to get name and role
+    const {name,email,role} = await inquirer.prompt([
       {
         type: "input",
         name: "name",
         message: "Enter employee's name: ",
+      },
+      {
+        type: "list",
+        name: "email",
+        message: "Enter employee's email: ",
       },
       {
         type: "list",
@@ -40,8 +55,9 @@ async function getEmployee() {
         choices: ["Manager", "Engineer", "Intern"],
       },
     ]);
+    //The next prompt depends on the role of the employee so this switch case determines the next prompt
     let roleSpecificPrompt;
-    switch (data1.role) {
+    switch (role) {
       case "Manager":
         roleSpecificPrompt = "Enter office number: ";
         break;
@@ -52,14 +68,30 @@ async function getEmployee() {
         roleSpecificPrompt = "Enter school: ";
         break;
     }
-    const data2 = await inquirer.prompt([
+    //A second in inquirer to get the specific question based on the role
+    const {specific} = await inquirer.prompt([
       {
         type: "input",
         name: "specific",
         message: roleSpecificPrompt,
       },
     ]);
-    team.push({ ...data1, ...data2 });
+    //Another switch case to create the employee based on the data gatherd
+    let employee;
+    switch (role) {
+      case "Manager":
+         employee = new Manager(name,idCount,email,specific);
+        break;
+      case "Engineer":
+         employee = new Engineer(name,idCount,email,specific);
+        break;
+      case "Intern":
+         employee = new Intern(name,idCount,email,specific);
+        break;
+    }
+    //push the new employee into an array
+    team.push(employee);
+    //a third prompt to decided to continue adding more empolyee or to return false
     const { addMore } = await inquirer.prompt([
       {
         type: "confirm",
@@ -72,6 +104,7 @@ async function getEmployee() {
     console.log(err);
   }
 }
+
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
