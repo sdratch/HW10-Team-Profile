@@ -9,11 +9,62 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
-
+const Choice = require("inquirer/lib/objects/choice");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+const team = [];
+let willContinue = true;
+getEmployee();
 
+async function getEmployee() {
+  try {
+    const data1 = await inquirer.prompt([
+      {
+        type: "input",
+        name: "name",
+        message: "Enter employee's name: ",
+      },
+      {
+        type: "list",
+        name: "role",
+        message: "Enter employee's role: ",
+        choices: ["Manager", "Engineer", "Intern"],
+      },
+    ]);
+    let roleSpecificPrompt;
+    switch (data1.role) {
+      case "Manager":
+        roleSpecificPrompt = "Enter office number: ";
+        break;
+      case "Engineer":
+        roleSpecificPrompt = "Enter github profile: ";
+        break;
+      case "Intern":
+        roleSpecificPrompt = "Enter school: ";
+        break;
+    }
+    const data2 = await inquirer.prompt([
+      {
+        type: "input",
+        name: "specific",
+        message: roleSpecificPrompt,
+      },
+    ]);
+    team.push({ ...data1, ...data2 });
+    const { addMore } = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "addMore",
+        message: "Add more employees?",
+      },
+    ]);
+    willContinue = addMore;
+
+  } catch (err) {
+    console.log(err);
+  }
+}
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
