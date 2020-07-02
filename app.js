@@ -14,29 +14,42 @@ const Choice = require("inquirer/lib/objects/choice");
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
 
-
 const team = [];
 let willContinue = true;
 let idCount = 0;
 
-loopEmploees()
-
-
+loopEmploees();
 async function loopEmploees(){
   while (willContinue) {
+    //call the async function to get one employee
    willContinue = await getEmployee();
+
+   //Check to make sure there is a manager on the team
+   //If there is not then send them back to making employees
+   if(!willContinue && !(team.some((employee) => employee.getRole() === "Manager"))){
+     console.log("Need a manager on team")
+     idCount--;
+     willContinue = true;
+   }
+   //increase the id count
    idCount++;
   }
+  //render the html look
   const html = render(team)
+  //write the html file to the output foler
   fs.writeFile("./output/team.html", html, (err)=>{
-    console.log(err)
+    if(err){
+      console.log(err)
+    }
+    console.log("Created html Successfully")
+   
   })
 }
 
 //function to get employees
 async function getEmployee() {
   try {
-    //start first inquirer to get name and role
+    //start first inquirer to get name, and email role
     const {name,email,role} = await inquirer.prompt([
       {
         type: "input",
@@ -44,7 +57,7 @@ async function getEmployee() {
         message: "Enter employee's name: ",
       },
       {
-        type: "list",
+        type: "input",
         name: "email",
         message: "Enter employee's email: ",
       },
