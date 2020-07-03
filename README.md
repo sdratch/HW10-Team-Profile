@@ -10,3 +10,5 @@ Once the entire team is created then an html file is made called "team.html" in 
 ![Video link (youtube)](https://youtu.be/FwjshVOGG0s)
 ![Video link (github)](./Assets/hw10Example.mp4)
 ![Image of results](./Assets/result.PNG)
+
+![Github Repo](https://github.com/sdratch/HW10-Team-Profile)
